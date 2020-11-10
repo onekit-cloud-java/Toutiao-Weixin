@@ -24,10 +24,13 @@ public class ToutiaoServer implements ToutiaoAPI {
 
     @Override
     public apps__jscode2session_response apps__jscode2session(String appid, String secret, String code, String anonymous_code) throws ToutiaoError {
-        apps__jscode2session_response response = new ToutiaoSDK().apps__jscode2session(appid,secret,code,anonymous_code);
+        apps__jscode2session_response wx_response = new ToutiaoSDK().apps__jscode2session(appid,secret,code,anonymous_code);
         //////////
-       // if(response.)
-        //////////
+        apps__jscode2session_response tt_response = new apps__jscode2session_response();
+        tt_response.setAnonymous_openid(wx_response.getOpenid());
+        tt_response.setOpenid(wx_response.getOpenid());
+        tt_response.setSession_key(wx_response.getSession_key());
+        return tt_response;
     }
 
     @Override
