@@ -8,10 +8,10 @@
         <version>2.3.5.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>demo</groupId>
-    <artifactId>test</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>test</name>
+    <groupId>cn.onekit.x2x.cloud</groupId>
+    <artifactId>toutiao-weixin-web</artifactId>
+    <version>1.0.0</version>
+    <name>toutiao-weixin-web</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
