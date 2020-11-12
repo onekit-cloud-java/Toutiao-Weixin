@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.onekit.x2x.cloud</groupId>
     <artifactId>toutiao-weixin-web</artifactId>
-    <version>1.0.0</version>
+    <version>0.0.1-SNAPSHOT</version>
     <name>toutiao-weixin-web</name>
     <description>Demo project for Spring Boot</description>
 
@@ -19,6 +19,16 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>cn.onekit.x2x.cloud</groupId>
+            <artifactId>thekit</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.onekit.x2x.cloud</groupId>
+            <artifactId>toutiao-weixin</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -34,6 +44,16 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.2.10.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.2.10.RELEASE</version>
         </dependency>
     </dependencies>
 
