@@ -1,5 +1,7 @@
 package cn.onekit.x2x.cloud.toutiao_weixin.web;
 
+import cn.onekit.thekit.DB;
+import cn.onekit.thekit.FILE;
 import cn.onekit.thekit.JSON;
 import cn.onekit.x2x.cloud.toutiao_weixin.*;
 import com.toutiao.developer.entity.*;
@@ -14,8 +16,48 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/toutiao")
 public class ToutiaoServerWeb {
-    ToutiaoServer ToutiaoServer = new ToutiaoServer(WeixinAccount.appid, WeixinAccount.secret);
-    ToutiaoServer2 ToutiaoServer2 = new ToutiaoServer2(WeixinAccount.appid, WeixinAccount.secret);
+    ToutiaoServer ToutiaoServer = new ToutiaoServer(WeixinAccount.appid, WeixinAccount.secret) {
+        @Override
+        protected void _jscode_openid(String wx_jscode, String wx_openid) {
+            DB.set("[toutiao2weixin] jscode_openid",wx_jscode,wx_openid);
+        }
+
+        @Override
+        protected String _jscode_openid(String wx_jscode) {
+            return DB.get("[toutiao2weixin] jscode_openid",wx_jscode);
+        }
+
+        @Override
+        protected void _openid_sessionkey(String openid, String sessionkey) {
+            DB.set("[toutiao2weixin] openid_sessionkey",openid,sessionkey);
+        }
+
+        @Override
+        protected String _openid_sessionkey(String openid) {
+            return DB.get("[toutiao2weixin] openid_sessionkey", openid);
+        }
+    };
+    ToutiaoServer2 ToutiaoServer2 = new ToutiaoServer2(WeixinAccount.appid, WeixinAccount.secret) {
+        @Override
+        protected void _jscode_openid(String wx_jscode, String wx_openid) {
+            DB.set("[toutiao2weixin] jscode_openid",wx_jscode,wx_openid);
+        }
+
+        @Override
+        protected String _jscode_openid(String wx_jscode) {
+            return DB.get("[toutiao2weixin] jscode_openid",wx_jscode);
+        }
+
+        @Override
+        protected void _openid_sessionkey(String openid, String sessionkey) {
+            DB.set("[toutiao2weixin] openid_sessionkey",openid,sessionkey);
+        }
+
+        @Override
+        protected String _openid_sessionkey(String openid) {
+            return DB.get("[toutiao2weixin] openid_sessionkey", openid);
+        }
+    };
 
     @RequestMapping("/api/apps/toke")
     public apps__token_response getAccessToken(

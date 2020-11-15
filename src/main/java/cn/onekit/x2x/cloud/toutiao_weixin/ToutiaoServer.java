@@ -2,30 +2,31 @@ package cn.onekit.x2x.cloud.toutiao_weixin;
 
 import cn.onekit.thekit.JSON;
 import com.google.gson.JsonObject;
+import com.qq.weixin.api.WeixinSDK;
 import com.qq.weixin.api.entity.*;
-import com.qq.weixin.api.sdk.WeixinSDK;
 import com.toutiao.developer.ToutiaoAPI;
 import com.toutiao.developer.entity.*;
-import com.toutiao.developer.sdk.ToutiaoSDK;
 
-public class ToutiaoServer implements ToutiaoAPI {
+public abstract class ToutiaoServer implements ToutiaoAPI {
 
-    private final String wx_secret;
     private final String wx_appid;
-
-    public ToutiaoServer(String wx_appid, String wx_secret){
-        this.wx_appid=wx_appid;
-        this.wx_secret=wx_secret;
-    }
-    @Override
-    public String _signBody(String sig_method, String session_key, String data) throws Exception {
-        return new ToutiaoSDK(null)._signBody(sig_method,session_key,data);
+    private final String wx_secret;
+    WeixinSDK weixinSDK= new WeixinSDK("https://api.weixin.qq.com");
+    public ToutiaoServer(
+            String wx_appid, String wx_secret) {
+        this.wx_appid = wx_appid;
+        this.wx_secret = wx_secret;
     }
 
-    @Override
-    public String _signRaw(String rawData, String session_key) throws Exception {
-        return new ToutiaoSDK(null)._signRaw( rawData,  session_key);
-    }
+    final String wx_sig_method = "hmac_sha256";
+
+    //////////////////////////////////////
+    abstract protected void _jscode_openid(String wx_jscode, String wx_openid);
+    abstract protected String _jscode_openid(String wx_jscode);
+    abstract protected void _openid_sessionkey(String wx_openid, String wx_sessionkey);
+    abstract protected String _openid_sessionkey(String wx_openid);
+
+    //////////////////////////////////////
 
     @Override
     public apps__token_response apps__token(
@@ -34,8 +35,7 @@ public class ToutiaoServer implements ToutiaoAPI {
             String tt_grant_type
     ) throws ToutiaoError {
         try {
-            //////////////////////
-            cgi_bin__token_response wx_response = new WeixinSDK().cgi_bin__token(wx_appid, wx_secret, tt_grant_type);
+            cgi_bin__token_response wx_response = weixinSDK.cgi_bin__token(wx_appid, wx_secret, tt_grant_type);
             /////////////////////
             apps__token_response tt_reponse = new apps__token_response();
             tt_reponse.setAccess_token(wx_response.getAccess_token());
@@ -56,20 +56,24 @@ public class ToutiaoServer implements ToutiaoAPI {
             String tt_code,
             String tt_anonymous_code
     ) throws ToutiaoError {
-        //////////////////////
-        snc__jscode2session_response wx_response = new WeixinSDK().snc__jscode2session(wx_appid,wx_secret, tt_code,"authorization_code");
+        final String wx_grant_type = "authorization_code";
+        snc__jscode2session_response wx_response = weixinSDK.snc__jscode2session(wx_appid, wx_secret, tt_code, wx_grant_type);
         //////////
-        if(wx_response.getErrcode()!=0){
+        if (wx_response.getErrcode() != 0) {
             ToutiaoError tt_error = new ToutiaoError();
             tt_error.setErrcode(9527);
             tt_error.setErrmsg(wx_response.getErrmsg());
             throw tt_error;
         }
+        String wx_openid = wx_response.getOpenid();
+        String wx_session_key = wx_response.getSession_key();
+        _jscode_openid(tt_code,wx_openid);
+        _openid_sessionkey(wx_openid,wx_session_key);
         ////////////
         apps__jscode2session_response tt_response = new apps__jscode2session_response();
-        tt_response.setAnonymous_openid(wx_response.getOpenid());
-        tt_response.setOpenid(wx_response.getOpenid());
-        tt_response.setSession_key(wx_response.getSession_key());
+        tt_response.setAnonymous_openid(wx_openid);
+        tt_response.setOpenid(wx_openid);
+        tt_response.setSession_key(wx_session_key);
         return tt_response;
     }
 
@@ -81,19 +85,33 @@ public class ToutiaoServer implements ToutiaoAPI {
             String tt_sig_method,
             apps__set_user_storage_body tt_body
     ) throws ToutiaoError {
-        JsonObject body = (JsonObject) JSON.object2json(tt_body);
-        wxa__set_user_storage_body wx_body = JSON.json2object(body,wxa__set_user_storage_body.class);
-        //////////////
-        WeixinResponse wx_response = new WeixinSDK().wxa__set_user_storage(tt_access_token, tt_openid, tt_signature, tt_sig_method, wx_body);
-        ////////////
-        if (wx_response.getErrcode() != 0) {
-            ToutiaoError tt_error = new ToutiaoError();
-            tt_error.setErrcode(9527);
-            tt_error.setErrmsg(wx_response.getErrmsg());
-            throw tt_error;
+        try {
+            String wx_session_key = _openid_sessionkey(tt_openid);
+            if (!_signBody(tt_sig_method, wx_session_key, JSON.object2string(tt_body)).equals(tt_signature)) {
+                throw new Exception("bad sign!");
+            }
+            //////////////
+            JsonObject body = (JsonObject) JSON.object2json(tt_body);
+            wxa__set_user_storage_body wx_body = JSON.json2object(body, wxa__set_user_storage_body.class);
+            String wx_signature = _signBody(wx_sig_method, wx_session_key, JSON.object2string(wx_body));
+            //////////////
+            WeixinResponse wx_response = weixinSDK.wxa__set_user_storage(tt_access_token, tt_openid, wx_signature, wx_sig_method, wx_body);
+            ////////////
+            if (wx_response.getErrcode() != 0) {
+                ToutiaoError tt_error = new ToutiaoError();
+                tt_error.setErrcode(9527);
+                tt_error.setErrmsg(wx_response.getErrmsg());
+                throw tt_error;
+            }
+            ////////////
+            return new apps__set_user_storage_response();
+        } catch (Exception e) {
+            e.printStackTrace();
+            ToutiaoError error = new ToutiaoError();
+            error.setError(9527);
+            error.setMessage(e.getMessage());
+            throw error;
         }
-        ////////////
-        return new apps__set_user_storage_response();
     }
 
     @Override
@@ -103,28 +121,53 @@ public class ToutiaoServer implements ToutiaoAPI {
             String tt_signature,
             String tt_sig_method,
             apps__remove_user_storage_body tt_body
-    )  {
-        JsonObject body = (JsonObject) JSON.object2json(tt_body);
-        wxa__remove_user_storage_body wx_body = JSON.json2object(body,wxa__remove_user_storage_body.class);
-        //////////////
-        WeixinResponse wx_response = new WeixinSDK().wxa__remove_user_storage(tt_access_token, tt_openid, tt_signature, tt_sig_method,wx_body);
-        ////////////
-        if(wx_response.getErrcode()!=0){
-            apps__remove_user_storage_response tt_error=new apps__remove_user_storage_response();
-            tt_error.setError(wx_response.getErrcode());
-            return tt_error;
+    ) throws ToutiaoError {
+        try {
+            String wx_session_key = _openid_sessionkey(tt_openid);
+            if (!_signBody(tt_sig_method, wx_session_key, JSON.object2string(tt_body)).equals(tt_signature)) {
+                throw new Exception("bad sign!");
+            }
+            //////////////
+            JsonObject body = (JsonObject) JSON.object2json(tt_body);
+            wxa__remove_user_storage_body wx_body = JSON.json2object(body, wxa__remove_user_storage_body.class);
+            String wx_signature = _signBody(wx_sig_method, wx_session_key, JSON.object2string(wx_body));
+            //////////////
+            WeixinResponse wx_response = weixinSDK.wxa__remove_user_storage(tt_access_token, tt_openid, wx_signature, wx_sig_method, wx_body);
+            ////////////
+            if (wx_response.getErrcode() != 0) {
+                apps__remove_user_storage_response tt_error = new apps__remove_user_storage_response();
+                tt_error.setError(wx_response.getErrcode());
+                return tt_error;
+            }
+            ////////////
+            apps__remove_user_storage_response tt_response = new apps__remove_user_storage_response();
+            tt_response.setError(0);
+            return tt_response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            ToutiaoError error = new ToutiaoError();
+            error.setError(9527);
+            error.setMessage(e.getMessage());
+            throw error;
         }
-        ////////////
-        apps__remove_user_storage_response tt_response = new apps__remove_user_storage_response();
-        tt_response.setError(0);
-        return tt_response;
     }
 
     @Override
     public byte[] apps__qrcode(
             apps__qrcode_body tt_body
     ) throws ToutiaoError {
-        return null;
+        try {
+            final String wx_access_token = tt_body.getAccess_token();
+            wxaapp__createwxaqrcode_body wx_body =new wxaapp__createwxaqrcode_body();
+            //////////////
+            return weixinSDK.cgi_bin__wxaapp__createwxaqrcode(wx_access_token, wx_body);
+        } catch (WeixinError weixinError) {
+            ToutiaoError error = new ToutiaoError();
+            error.setErrcode(9527);
+            error.setMessage(weixinError.getMessage());
+            throw error;
+        }
+
     }
 
 

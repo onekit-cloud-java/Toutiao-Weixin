@@ -10,17 +10,19 @@
     <dependencies>
         <dependency>
             <groupId>cn.onekit.x2x.cloud</groupId>
-            <artifactId>toutiao-sdk</artifactId>
-            <version>4.0.4</version>
+            <artifactId>toutiao</artifactId>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>cn.onekit.x2x.cloud</groupId>
             <artifactId>weixin-sdk</artifactId>
-            <version>1.5.0</version>
+            <version>1.7.0</version>
         </dependency>
     </dependencies>
 
-
+    <!--
+    mvn clean deploy -P release
+    -->
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
