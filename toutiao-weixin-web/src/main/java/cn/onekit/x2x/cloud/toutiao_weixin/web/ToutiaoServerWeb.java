@@ -56,7 +56,7 @@ public class ToutiaoServerWeb {
         }
     };
 
-    @RequestMapping(method = RequestMethod.GET,value="/api/apps/toke")
+    @RequestMapping(method = RequestMethod.GET,value="/api/apps/token")
     public apps__token_response getAccessToken(
             @RequestParam String appid,
             @RequestParam String secret,

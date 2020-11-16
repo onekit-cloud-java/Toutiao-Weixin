@@ -35,7 +35,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             String tt_grant_type
     ) throws ToutiaoError {
         try {
-            cgi_bin__token_response wx_response = weixinSDK.cgi_bin__token(wx_appid, wx_secret, tt_grant_type);
+            final String wx_grant_type = "client_credential";
+            cgi_bin__token_response wx_response = weixinSDK.cgi_bin__token(wx_appid, wx_secret, wx_grant_type);
             /////////////////////
             apps__token_response tt_reponse = new apps__token_response();
             tt_reponse.setAccess_token(wx_response.getAccess_token());
