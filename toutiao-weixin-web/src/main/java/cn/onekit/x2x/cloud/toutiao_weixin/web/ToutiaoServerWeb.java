@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/toutiao")
 public class ToutiaoServerWeb {
-    ToutiaoServer ToutiaoServer = new ToutiaoServer(WeixinAccount.appid, WeixinAccount.secret) {
+    ToutiaoServer toutiaoServer = new ToutiaoServer(WeixinAccount.appid, WeixinAccount.secret) {
         @Override
         protected void _jscode_openid(String wx_jscode, String wx_openid) {
             DB.set("[toutiao2weixin] jscode_openid",wx_jscode,wx_openid);
@@ -62,7 +62,7 @@ public class ToutiaoServerWeb {
             @RequestParam String secret,
             @RequestParam String grant_type
     ) throws Exception {
-        return ToutiaoServer.apps__token(appid, secret, grant_type);
+        return toutiaoServer.apps__token(appid, secret, grant_type);
     }
 
     @RequestMapping(method = RequestMethod.GET,value = "/api/apps/jscode2session")
@@ -71,7 +71,7 @@ public class ToutiaoServerWeb {
             @RequestParam String secret,
             @RequestParam String code
     ) throws Exception {
-        return ToutiaoServer.apps__jscode2session(appid, secret, code, null);
+        return toutiaoServer.apps__jscode2session(appid, secret, code, null);
 
     }
 
@@ -83,7 +83,7 @@ public class ToutiaoServerWeb {
             @RequestParam String signature,
             @RequestBody String body
     ) throws Exception {
-        return ToutiaoServer.apps__set_user_storage(session_key, access_token, openid, signature, JSON.string2object(body, apps__set_user_storage_body.class));
+        return toutiaoServer.apps__set_user_storage(session_key, access_token, openid, signature, JSON.string2object(body, apps__set_user_storage_body.class));
     }
 
     @RequestMapping("/removeUserStorage")
@@ -94,14 +94,14 @@ public class ToutiaoServerWeb {
             @RequestParam String signature,
             @RequestBody String body
     ) throws Exception {
-        return ToutiaoServer.apps__remove_user_storage(session_key, access_token, openid, signature, JSON.string2object(body, apps__remove_user_storage_body.class));
+        return toutiaoServer.apps__remove_user_storage(session_key, access_token, openid, signature, JSON.string2object(body, apps__remove_user_storage_body.class));
     }
 
     @RequestMapping("/createQRCode")
     public byte[] createQRCode(
             @RequestBody String body
     ) throws Exception {
-        return ToutiaoServer.apps__qrcode(JSON.string2object(body, apps__qrcode_body.class));
+        return toutiaoServer.apps__qrcode(JSON.string2object(body, apps__qrcode_body.class));
     }
 
     @RequestMapping("/checkContent")
