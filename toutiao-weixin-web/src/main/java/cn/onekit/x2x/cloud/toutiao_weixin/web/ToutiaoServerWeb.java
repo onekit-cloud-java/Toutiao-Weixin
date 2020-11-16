@@ -6,10 +6,7 @@ import cn.onekit.thekit.JSON;
 import cn.onekit.x2x.cloud.toutiao_weixin.*;
 import com.toutiao.developer.entity.*;
 import com.toutiao.developer.entity.v2.*;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -59,7 +56,7 @@ public class ToutiaoServerWeb {
         }
     };
 
-    @RequestMapping("/api/apps/toke")
+    @RequestMapping(method = RequestMethod.GET,value="/api/apps/toke")
     public apps__token_response getAccessToken(
             @RequestParam String appid,
             @RequestParam String secret,
@@ -68,7 +65,7 @@ public class ToutiaoServerWeb {
         return ToutiaoServer.apps__token(appid, secret, grant_type);
     }
 
-    @RequestMapping("/api/apps/jscode2session")
+    @RequestMapping(method = RequestMethod.GET,value = "/api/apps/jscode2session")
     public apps__jscode2session_response code2Session1(
             @RequestParam String appid,
             @RequestParam String secret,
