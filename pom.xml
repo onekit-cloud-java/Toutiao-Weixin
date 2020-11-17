@@ -6,7 +6,7 @@
 
     <groupId>cn.onekit.x2x.cloud</groupId>
     <artifactId>toutiao-weixin</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.3</version>
     <name>toutiao-weixin</name>
     <url>https://github.com/onekit-cloud-java/toutiao-weixin</url>
     <description>Toutiao Server for Weixin</description>
@@ -131,17 +131,6 @@
                         <version>2.5.1</version>
                     </plugin>
                 </plugins>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-gpg-plugin</artifactId>
-                            <configuration>
-                                <skip>true</skip>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
             </build>
             <distributionManagement>
                 <snapshotRepository>
