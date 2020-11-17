@@ -148,8 +148,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
                 throw new Exception("bad sign!");
             }
             //////////////
-            JsonObject body = (JsonObject) JSON.object2json(tt_body);
-            wxa__remove_user_storage_body wx_body = JSON.json2object(body, wxa__remove_user_storage_body.class);
+            wxa__remove_user_storage_body wx_body = new wxa__remove_user_storage_body();
+            wx_body.setKey(tt_body.getKey());
             String wx_signature = _signBody(wx_sig_method, wx_session_key, JSON.object2string(wx_body));
             //////////////
             WeixinResponse wx_response = weixinSDK.wxa__remove_user_storage(tt_access_token, tt_openid, wx_signature, wx_sig_method, wx_body);
