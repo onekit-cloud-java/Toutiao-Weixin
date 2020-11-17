@@ -24,12 +24,12 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
     abstract protected String _openid_sessionkey(String wx_openid);
 
     @Override
-    public tags__text__antidirt_response tags__text__antidirt(String tt_X_Token, tags__text__antidirt_body tt_body) throws ToutiaoError {
+    public tags__text__antidirt_response tags__text__antidirt(String tt_X_Token, tags__text__antidirt_body tt_body) throws ToutiaoError2 {
        return null;
     }
 
     @Override
-    public tags__image_response tags__image(String X_Token, tags__image_body body) throws ToutiaoError {
+    public tags__image_response tags__image(String X_Token, tags__image_body body) throws ToutiaoError2 {
         return null;
     }
 }

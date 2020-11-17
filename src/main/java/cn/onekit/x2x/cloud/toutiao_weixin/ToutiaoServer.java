@@ -4,8 +4,9 @@ import cn.onekit.thekit.JSON;
 import com.google.gson.JsonObject;
 import com.qq.weixin.api.WeixinSDK;
 import com.qq.weixin.api.entity.*;
-import com.toutiao.developer.ToutiaoAPI;
+import com.toutiao.developer.*;
 import com.toutiao.developer.entity.*;
+import com.toutiao.developer.entity.v2.*;
 
 public abstract class ToutiaoServer implements ToutiaoAPI {
 
@@ -57,6 +58,16 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             String tt_code,
             String tt_anonymous_code
     ) throws ToutiaoError {
+        String wx_openid = _jscode_openid(tt_code);
+        String wx_session_key;
+        if(wx_openid!=null){
+            wx_session_key = _openid_sessionkey(wx_openid);
+            apps__jscode2session_response tt_response = new apps__jscode2session_response();
+            tt_response.setAnonymous_openid(wx_openid);
+            tt_response.setOpenid(wx_openid);
+            tt_response.setSession_key(wx_session_key);
+            return tt_response;
+        }
         final String wx_grant_type = "authorization_code";
         snc__jscode2session_response wx_response = weixinSDK.snc__jscode2session(wx_appid, wx_secret, tt_code, wx_grant_type);
         //////////
@@ -66,8 +77,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             tt_error.setErrmsg(wx_response.getErrmsg());
             throw tt_error;
         }
-        String wx_openid = wx_response.getOpenid();
-        String wx_session_key = wx_response.getSession_key();
+         wx_openid = wx_response.getOpenid();
+         wx_session_key = wx_response.getSession_key();
         _jscode_openid(tt_code,wx_openid);
         _openid_sessionkey(wx_openid,wx_session_key);
         ////////////
