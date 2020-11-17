@@ -70,14 +70,14 @@ public class ToutiaoServerWeb {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/apps/jscode2session")
-    public String code2Session1(
+    public String code2Session(
             @RequestParam String appid,
             @RequestParam String secret,
-            @RequestParam String code,
-            HttpServletResponse response
+            @RequestParam(required=false) String code,
+            @RequestParam(required=false)  String anonymous_code
     ) throws Exception {
         try {
-            return JSON.object2string(toutiaoServer.apps__jscode2session(appid, secret, code, null));
+            return JSON.object2string(toutiaoServer.apps__jscode2session(appid, secret, code, anonymous_code));
         } catch (ToutiaoError error) {
             return JSON.object2string(error);
         }

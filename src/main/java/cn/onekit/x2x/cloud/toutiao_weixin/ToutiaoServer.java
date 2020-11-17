@@ -59,7 +59,9 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             String tt_code,
             String tt_anonymous_code
     ) throws ToutiaoError {
-        String wx_openid = _jscode_openid(tt_code);
+        final String code = tt_code!=null?tt_code:tt_anonymous_code;
+        /////////////////// cache ///////////////////////////
+        String wx_openid = _jscode_openid(code);
         String wx_session_key;
         if(wx_openid!=null){
             wx_session_key = _openid_sessionkey(wx_openid);
@@ -69,8 +71,9 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             tt_response.setSession_key(wx_session_key);
             return tt_response;
         }
+        ///////////////////////////////////////////////////
         final String wx_grant_type = "authorization_code";
-        snc__jscode2session_response wx_response = weixinSDK.snc__jscode2session(wx_appid, wx_secret, tt_code, wx_grant_type);
+        snc__jscode2session_response wx_response = weixinSDK.snc__jscode2session(wx_appid, wx_secret, code, wx_grant_type);
         //////////
         if (wx_response.getErrcode() != 0) {
             ToutiaoError tt_error = new ToutiaoError();
@@ -81,7 +84,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
         }
          wx_openid = wx_response.getOpenid();
          wx_session_key = wx_response.getSession_key();
-        _jscode_openid(tt_code,wx_openid);
+         ///////////////
+        _jscode_openid(code,wx_openid);
         _openid_sessionkey(wx_openid,wx_session_key);
         ////////////
         apps__jscode2session_response tt_response = new apps__jscode2session_response();
