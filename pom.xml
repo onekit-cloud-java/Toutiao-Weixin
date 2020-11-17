@@ -6,7 +6,7 @@
 
     <groupId>cn.onekit.x2x.cloud</groupId>
     <artifactId>toutiao-weixin</artifactId>
-    <version>1.2.2</version>
+    <version>1.4.4</version>
     <name>toutiao-weixin</name>
     <url>https://github.com/onekit-cloud-java/toutiao-weixin</url>
     <description>Toutiao Server for Weixin</description>
@@ -14,12 +14,12 @@
         <dependency>
             <groupId>cn.onekit.x2x.cloud</groupId>
             <artifactId>toutiao</artifactId>
-            <version>4.2.1</version>
+            <version>4.4.44</version>
         </dependency>
         <dependency>
             <groupId>cn.onekit.x2x.cloud</groupId>
             <artifactId>weixin-sdk</artifactId>
-            <version>1.7.1</version>
+            <version>2.0.0</version>
         </dependency>
     </dependencies>
 

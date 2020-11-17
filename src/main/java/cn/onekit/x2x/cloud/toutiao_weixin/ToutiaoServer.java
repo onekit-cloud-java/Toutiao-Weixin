@@ -45,7 +45,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             return tt_reponse;
         } catch (WeixinError e) {
             ToutiaoError tt_error = new ToutiaoError();
-            tt_error.setErrcode(9527);
+            tt_error.setError(9527);
+            tt_error.setErrcode(e.getErrcode());
             tt_error.setErrmsg(e.getMessage());
             throw tt_error;
         }
@@ -73,7 +74,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
         //////////
         if (wx_response.getErrcode() != 0) {
             ToutiaoError tt_error = new ToutiaoError();
-            tt_error.setErrcode(9527);
+            tt_error.setError(9527);
+            tt_error.setErrcode(wx_response.getErrcode());
             tt_error.setErrmsg(wx_response.getErrmsg());
             throw tt_error;
         }
@@ -111,7 +113,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             ////////////
             if (wx_response.getErrcode() != 0) {
                 ToutiaoError tt_error = new ToutiaoError();
-                tt_error.setErrcode(9527);
+                tt_error.setError(9527);
+                tt_error.setErrcode(wx_response.getErrcode());
                 tt_error.setErrmsg(wx_response.getErrmsg());
                 throw tt_error;
             }
@@ -121,7 +124,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             e.printStackTrace();
             ToutiaoError error = new ToutiaoError();
             error.setError(9527);
-            error.setMessage(e.getMessage());
+            error.setError(9527);
+            error.setErrmsg(e.getMessage());
             throw error;
         }
     }
@@ -148,7 +152,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             ////////////
             if (wx_response.getErrcode() != 0) {
                 apps__remove_user_storage_response tt_error = new apps__remove_user_storage_response();
-                tt_error.setError(wx_response.getErrcode());
+                tt_error.setError(9527);
                 return tt_error;
             }
             ////////////
@@ -159,7 +163,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             e.printStackTrace();
             ToutiaoError error = new ToutiaoError();
             error.setError(9527);
-            error.setMessage(e.getMessage());
+            error.setErrmsg(e.getMessage());
             throw error;
         }
     }
@@ -173,11 +177,12 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             wxaapp__createwxaqrcode_body wx_body =new wxaapp__createwxaqrcode_body();
             //////////////
             return weixinSDK.cgi_bin__wxaapp__createwxaqrcode(wx_access_token, wx_body);
-        } catch (WeixinError weixinError) {
-            ToutiaoError error = new ToutiaoError();
-            error.setErrcode(9527);
-            error.setMessage(weixinError.getMessage());
-            throw error;
+        } catch (WeixinError wx_error) {
+            ToutiaoError tt_error = new ToutiaoError();
+            tt_error.setError(9527);
+            tt_error.setErrcode(wx_error.getErrcode());
+            tt_error.setErrmsg(wx_error.getErrmsg());
+            throw tt_error;
         }
 
     }
