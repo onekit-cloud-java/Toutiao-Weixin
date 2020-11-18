@@ -1,6 +1,9 @@
 package cn.onekit.x2x.cloud.toutiao_weixin;
 
+import cn.onekit.thekit.JSON;
 import com.qq.weixin.api.WeixinSDK;
+import com.qq.weixin.api.entity.WeixinResponse;
+import com.qq.weixin.api.entity.wxa__remove_user_storage_body;
 import com.toutiao.developer.ToutiaoAPI2;
 import com.toutiao.developer.entity.v2.*;
 
@@ -25,7 +28,9 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
 
     @Override
     public tags__text__antidirt_response tags__text__antidirt(String tt_X_Token, tags__text__antidirt_body tt_body) throws ToutiaoError2 {
-       return null;
+
+        //////////////
+        return null;
     }
 
     @Override
