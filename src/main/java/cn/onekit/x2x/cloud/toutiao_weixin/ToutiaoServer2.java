@@ -1,5 +1,6 @@
 package cn.onekit.x2x.cloud.toutiao_weixin;
 
+import cn.onekit.thekit.AJAX;
 import cn.onekit.thekit.JSON;
 import com.google.gson.JsonObject;
 import com.qq.weixin.api.WeixinSDK;
@@ -13,6 +14,7 @@ import com.toutiao.developer.entity.ToutiaoError;
 import com.toutiao.developer.entity.apps__remove_user_storage_response;
 import com.toutiao.developer.entity.v2.*;
 import javafx.concurrent.Task;
+import org.bouncycastle.util.encoders.Base64;
 
 import java.util.ArrayList;
 
@@ -91,17 +93,55 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
     @Override
     public tags__image_response tags__image(String tt_X_Token, tags__image_body tt_body) throws ToutiaoError2 {
     try{
-        JsonObject body = (JsonObject) JSON.object2json(tt_body);
-        byte[] wx_body = JSON.json2object(body, byte[].class);
-        WeixinResponse wx_response = weixinSDK.wxa__img_sec_check(tt_X_Token, wx_body);
 
-        if (wx_response.getErrcode() != 0) {
-            ToutiaoError2 tt_error = new ToutiaoError2();
-            tt_error.setCode(wx_response.getErrcode());
-            tt_error.setMessage(wx_response.getErrmsg());
-            throw tt_error;
+        tags__image_response tt_response = new tags__image_response();
+        ArrayList<tags__image_response.Data> datas = new ArrayList<>();
+        for(tags__image_body.Task task: tt_body.getTasks()) {
+            byte[] wx_body;
+            if(task.getImage_data()!=null){
+                wx_body = Base64.decode(task.getImage_data().substring(task.getImage_data().indexOf(",")+1));
+            }else if(task.getImage()!=null){
+                wx_body = AJAX.download(task.getImage(),"GET",null);
+            }else{
+                ToutiaoError toutiaoError = new ToutiaoError();
+                toutiaoError.setErrcode(0);
+                toutiaoError.setError(0);
+                toutiaoError.setErrmsg("xxxx");
+                throw toutiaoError;
+            }
+            WeixinResponse wx_response = weixinSDK.wxa__img_sec_check(tt_X_Token, wx_body);
+            tags__image_response.Data data = new tags__image_response.Data();
+            if (wx_response.getErrcode() != 0) {
+                data.setMsg("");
+                data.setCode(0);
+                data.setTask_id("");
+                Predict predict = new Predict();
+                predict.setProb(1);
+                predict.setHit(true);
+                predict.setTarget(null);
+                predict.setModel_name("short_content_antidirt");
+                ArrayList<Predict> predicts = new ArrayList<>();
+                predicts.add(predict);
+                data.setPredicts(predicts);
+                data.setData_id(null);
+            } else {
+                data.setMsg("");
+                data.setCode(0);
+                data.setTask_id("");
+                Predict predict = new Predict();
+                predict.setProb(0);
+                predict.setHit(false);
+                predict.setTarget(null);
+                predict.setModel_name("short_content_antidirt");
+                ArrayList<Predict> predicts = new ArrayList<>();
+                predicts.add(predict);
+                data.setPredicts(predicts);
+                data.setData_id(null);
+            }
+            datas.add(data);
         }
-        return new tags__image_response();
+        tt_response.setData(datas);
+        return tt_response;
     } catch (Exception e) {
         e.printStackTrace();
         ToutiaoError2 error = new ToutiaoError2();
