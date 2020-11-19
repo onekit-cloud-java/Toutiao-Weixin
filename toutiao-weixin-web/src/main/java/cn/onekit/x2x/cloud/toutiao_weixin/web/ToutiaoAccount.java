@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(value = {"classpath:config.properties"},ignoreResourceNotFound = true)
-public class WeixinAccount implements ApplicationContextAware {
+public class ToutiaoAccount implements ApplicationContextAware {
 
-    static String wx_appid;
-    static String wx_secret;
 
+    static String tt_appid;
+    static String tt_secret;
 
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        wx_appid = applicationContext.getEnvironment().getProperty("weixin.appid");
-        wx_secret = applicationContext.getEnvironment().getProperty("weixin.secret");
 
+        tt_appid = applicationContext.getEnvironment().getProperty("toutiao.appid");
+        tt_secret = applicationContext.getEnvironment().getProperty("toutiao.secret");
     }
 }

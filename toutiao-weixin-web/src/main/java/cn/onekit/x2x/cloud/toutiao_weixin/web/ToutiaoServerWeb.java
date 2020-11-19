@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/toutiao")
+@RequestMapping("/")
 public class ToutiaoServerWeb {
 
 private ToutiaoServer _toutiaoServer;
     private ToutiaoServer toutiaoServer() {
        if(_toutiaoServer==null){
-           _toutiaoServer = new ToutiaoServer(WeixinAccount.appid, WeixinAccount.secret) {
+           _toutiaoServer = new ToutiaoServer(WeixinAccount.wx_appid, WeixinAccount.wx_secret) {
 
                @Override
                protected void _jscode_openid(String wx_jscode, String wx_openid) {
@@ -70,7 +70,7 @@ private ToutiaoServer _toutiaoServer;
         }
     }
 
-    @RequestMapping("/setUserStorage")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/apps/set_user_storage")
     public String setUserStorage(
             @RequestParam String session_key,
             @RequestParam String access_token,
@@ -85,7 +85,7 @@ private ToutiaoServer _toutiaoServer;
         }
     }
 
-    @RequestMapping("/removeUserStorage")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/apps/remove_user_storage")
     public String removeUserStorage(
             @RequestParam String session_key,
             @RequestParam String access_token,
@@ -100,7 +100,7 @@ private ToutiaoServer _toutiaoServer;
         }
     }
 
-    @RequestMapping("/createQRCode")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/apps/qrcoden")
     public byte[] createQRCode(
             @RequestBody String body
     ) throws Exception {
@@ -110,30 +110,6 @@ private ToutiaoServer _toutiaoServer;
             return JSON.object2string(error).getBytes();
         }
     }
-/*
-    @RequestMapping("/checkContent")
-    public String checkContent(
-            HttpServletRequest request,
-            @RequestBody String body
-    ) throws Exception {
-        String x_Token = request.getHeader("X-Token");
-        try {
-            return JSON.object2string(toutiaoServer2.tags__text__antidirt(x_Token, JSON.string2object(body, tags__text__antidirt_body.class)));
-        } catch (ToutiaoError2 error) {
-            return JSON.object2string(error);
-        }
-    }
 
-    @RequestMapping("/checkImage")
-    public String checkImage(
-            HttpServletRequest request,
-            @RequestBody String body
-    ) throws Exception {
-        String x_Token = request.getHeader("X-Token");
-        try {
-            return JSON.object2string(toutiaoServer2.tags__image(x_Token, JSON.string2object(body, tags__image_body.class)));
-        } catch (ToutiaoError2 error) {
-            return JSON.object2string(error);
-        }
-    }*/
+
 }
