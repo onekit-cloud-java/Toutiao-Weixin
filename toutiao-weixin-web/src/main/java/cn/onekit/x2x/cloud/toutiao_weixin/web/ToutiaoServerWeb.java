@@ -9,6 +9,8 @@ import com.toutiao.developer.entity.apps__remove_user_storage_body;
 import com.toutiao.developer.entity.apps__set_user_storage_body;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @RestController
 @RequestMapping("/")
@@ -48,11 +50,17 @@ private ToutiaoServer _toutiaoServer;
             @RequestParam String appid,
             @RequestParam String secret,
             @RequestParam String grant_type
-    ) throws Exception {
+    )  {
         try {
             return JSON.object2string(toutiaoServer().apps__token(appid, secret, grant_type));
-        } catch (ToutiaoError error) {
-            return JSON.object2string(error);
+        } catch (ToutiaoError toutiaoError) {
+            return JSON.object2string(toutiaoError);
+        }catch (Exception error){
+            ToutiaoError toutiaoError = new ToutiaoError();
+            toutiaoError.setError(500);
+            toutiaoError.setErrcode(500);
+            toutiaoError.setErrmsg(error.getMessage());
+            return JSON.object2string(toutiaoError);
         }
     }
 
@@ -62,26 +70,39 @@ private ToutiaoServer _toutiaoServer;
             @RequestParam String secret,
             @RequestParam(required=false) String code,
             @RequestParam(required=false)  String anonymous_code
-    ) throws Exception {
+    )  {
         try {
             return JSON.object2string(toutiaoServer().apps__jscode2session(appid, secret, code, anonymous_code));
-        } catch (ToutiaoError error) {
-            return JSON.object2string(error);
+        }catch (ToutiaoError toutiaoError) {
+            return JSON.object2string(toutiaoError);
+        }catch (Exception error){
+            ToutiaoError toutiaoError = new ToutiaoError();
+            toutiaoError.setError(500);
+            toutiaoError.setErrcode(500);
+            toutiaoError.setErrmsg(error.getMessage());
+            return JSON.object2string(toutiaoError);
         }
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/apps/set_user_storage")
     public String setUserStorage(
-            @RequestParam String session_key,
-            @RequestParam String access_token,
-            @RequestParam String openid,
-            @RequestParam String signature,
+            HttpServletRequest requeest,
             @RequestBody String body
-    ) throws Exception {
+    )  {
         try {
-            return JSON.object2string(toutiaoServer().apps__set_user_storage(session_key, access_token, openid, signature, JSON.string2object(body, apps__set_user_storage_body.class)));
-        } catch (ToutiaoError error) {
-            return JSON.object2string(error);
+            String sig_method = requeest.getParameter("sig_method");
+            String access_token = requeest.getParameter("access_token");
+            String openid = requeest.getParameter("openid");
+            String signature = requeest.getParameter("signature");
+            return JSON.object2string(toutiaoServer().apps__set_user_storage( access_token, openid, signature, sig_method,JSON.string2object(body, apps__set_user_storage_body.class)));
+        } catch (ToutiaoError toutiaoError) {
+            return JSON.object2string(toutiaoError);
+        }catch (Exception error){
+            ToutiaoError toutiaoError = new ToutiaoError();
+            toutiaoError.setError(500);
+            toutiaoError.setErrcode(500);
+            toutiaoError.setErrmsg(error.getMessage());
+            return JSON.object2string(toutiaoError);
         }
     }
 
@@ -92,22 +113,34 @@ private ToutiaoServer _toutiaoServer;
             @RequestParam String openid,
             @RequestParam String signature,
             @RequestBody String body
-    ) throws Exception {
+    )  {
         try {
             return JSON.object2string(toutiaoServer().apps__remove_user_storage(session_key, access_token, openid, signature, JSON.string2object(body, apps__remove_user_storage_body.class)));
-        } catch (ToutiaoError error) {
-            return JSON.object2string(error);
+        } catch (ToutiaoError toutiaoError) {
+            return JSON.object2string(toutiaoError);
+        }catch (Exception error){
+            ToutiaoError toutiaoError = new ToutiaoError();
+            toutiaoError.setError(500);
+            toutiaoError.setErrcode(500);
+            toutiaoError.setErrmsg(error.getMessage());
+            return JSON.object2string(toutiaoError);
         }
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/apps/qrcoden")
     public byte[] createQRCode(
             @RequestBody String body
-    ) throws Exception {
+    )  {
         try {
             return toutiaoServer().apps__qrcode(JSON.string2object(body, apps__qrcode_body.class));
-        } catch (ToutiaoError error) {
-            return JSON.object2string(error).getBytes();
+        } catch (ToutiaoError toutiaoError) {
+            return null;
+        }catch (Exception error){
+            ToutiaoError toutiaoError = new ToutiaoError();
+            toutiaoError.setError(500);
+            toutiaoError.setErrcode(500);
+            toutiaoError.setErrmsg(error.getMessage());
+            return null;
         }
     }
 

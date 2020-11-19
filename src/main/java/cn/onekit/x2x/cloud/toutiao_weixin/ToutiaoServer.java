@@ -128,7 +128,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             e.printStackTrace();
             ToutiaoError error = new ToutiaoError();
             error.setError(9527);
-            error.setError(9527);
+            error.setErrcode(9527);
             error.setErrmsg(e.getMessage());
             throw error;
         }
@@ -167,6 +167,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             e.printStackTrace();
             ToutiaoError error = new ToutiaoError();
             error.setError(9527);
+            error.setErrcode(9527);
             error.setErrmsg(e.getMessage());
             throw error;
         }
