@@ -7,9 +7,11 @@ import com.toutiao.developer.entity.ToutiaoError;
 import com.toutiao.developer.entity.apps__qrcode_body;
 import com.toutiao.developer.entity.apps__remove_user_storage_body;
 import com.toutiao.developer.entity.apps__set_user_storage_body;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 @RestController
@@ -86,14 +88,14 @@ private ToutiaoServer _toutiaoServer;
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/apps/set_user_storage")
     public String setUserStorage(
-            HttpServletRequest requeest,
+            HttpServletRequest request,
             @RequestBody String body
     )  {
         try {
-            String sig_method = requeest.getParameter("sig_method");
-            String access_token = requeest.getParameter("access_token");
-            String openid = requeest.getParameter("openid");
-            String signature = requeest.getParameter("signature");
+            String sig_method = request.getParameter("sig_method");
+            String access_token = request.getParameter("access_token");
+            String openid = request.getParameter("openid");
+            String signature = request.getParameter("signature");
             return JSON.object2string(toutiaoServer().apps__set_user_storage( access_token, openid, signature, sig_method,JSON.string2object(body, apps__set_user_storage_body.class)));
         } catch (ToutiaoError toutiaoError) {
             return JSON.object2string(toutiaoError);
@@ -127,9 +129,10 @@ private ToutiaoServer _toutiaoServer;
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api/apps/qrcoden")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/apps/qrcode",produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] createQRCode(
-            @RequestBody String body
+            @RequestBody String body,
+            HttpServletResponse response
     )  {
         try {
             return toutiaoServer().apps__qrcode(JSON.string2object(body, apps__qrcode_body.class));
