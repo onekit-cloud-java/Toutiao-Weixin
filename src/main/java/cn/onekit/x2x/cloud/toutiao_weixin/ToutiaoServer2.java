@@ -8,9 +8,13 @@ import com.qq.weixin.api.entity.wxa__msg_sec_check_body;
 import com.qq.weixin.api.entity.wxa__remove_user_storage_body;
 import com.qq.weixin.api.entity.wxa__set_user_storage_body;
 import com.toutiao.developer.ToutiaoAPI2;
+import com.toutiao.developer.entity.Predict;
 import com.toutiao.developer.entity.ToutiaoError;
 import com.toutiao.developer.entity.apps__remove_user_storage_response;
 import com.toutiao.developer.entity.v2.*;
+import javafx.concurrent.Task;
+
+import java.util.ArrayList;
 
 public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
 
@@ -36,17 +40,45 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
 
         //////////////
     try{
-        JsonObject body = (JsonObject) JSON.object2json(tt_body);
-        wxa__msg_sec_check_body wx_body = JSON.json2object(body, wxa__msg_sec_check_body.class);
-        WeixinResponse wx_response = weixinSDK.wxa__msg_sec_check(tt_X_Token, wx_body);
-
-        if (wx_response.getErrcode() != 0) {
-            ToutiaoError2 tt_error = new ToutiaoError2();
-            tt_error.setCode(wx_response.getErrcode());
-            tt_error.setMessage(wx_response.getErrmsg());
-            throw tt_error;
+        tags__text__antidirt_response tt_response = new tags__text__antidirt_response();
+        ArrayList<tags__text__antidirt_response.Data> datas = new ArrayList<>();
+        for(tags__text__antidirt_body.Task task: tt_body.getTasks()) {
+            wxa__msg_sec_check_body wx_body = new wxa__msg_sec_check_body();
+            wx_body.setContent(task.getContent());
+            WeixinResponse wx_response = weixinSDK.wxa__msg_sec_check(tt_X_Token, wx_body);
+//
+            tags__text__antidirt_response.Data data = new tags__text__antidirt_response.Data();
+            if (wx_response.getErrcode() != 0) {
+               data.setMsg("");
+               data.setCode(0);
+               data.setTask_id("");
+               Predict predict =new Predict();
+               predict.setProb(1);
+               predict.setHit(true);
+               predict.setTarget(null);
+               predict.setModel_name("short_content_antidirt");
+               ArrayList<Predict> predicts =new ArrayList<>();
+               predicts.add(predict);
+               data.setPredicts(predicts);
+               data.setData_id(null);
+            }else{
+                data.setMsg("");
+                data.setCode(0);
+                data.setTask_id("");
+                Predict predict =new Predict();
+                predict.setProb(0);
+                predict.setHit(false);
+                predict.setTarget(null);
+                predict.setModel_name("short_content_antidirt");
+                ArrayList<Predict> predicts =new ArrayList<>();
+                predicts.add(predict);
+                data.setPredicts(predicts);
+                data.setData_id(null);
+            }
+            datas.add(data);
         }
-        return new tags__text__antidirt_response();
+        tt_response.setData(datas);
+        return tt_response;
     } catch (Exception e) {
         e.printStackTrace();
         ToutiaoError2 error = new ToutiaoError2();

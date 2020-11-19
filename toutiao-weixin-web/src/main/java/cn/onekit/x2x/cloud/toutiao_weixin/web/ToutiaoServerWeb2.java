@@ -43,11 +43,11 @@ public class ToutiaoServerWeb2 {
         }
         return _toutiaoServer2;
     }
-    @RequestMapping(method = RequestMethod.GET, value = "/api/v2/tags/text/antidirt")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/v2/tags/text/antidirt")
     public String checkContent(
             HttpServletRequest request,
             @RequestBody String body
-    ) throws Exception {
+    )  {
         String x_Token = request.getHeader("X-Token");
         try {
             return JSON.object2string(toutiaoServer2().tags__text__antidirt(x_Token, JSON.string2object(body, tags__text__antidirt_body.class)));
@@ -56,11 +56,11 @@ public class ToutiaoServerWeb2 {
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "api/v2/tags/image/")
+    @RequestMapping(method = RequestMethod.POST, value = "api/v2/tags/image/")
     public String checkImage(
             HttpServletRequest request,
             @RequestBody String body
-    ) throws Exception {
+    )  {
         String x_Token = request.getHeader("X-Token");
         try {
             return JSON.object2string(toutiaoServer2().tags__image(x_Token, JSON.string2object(body, tags__image_body.class)));
