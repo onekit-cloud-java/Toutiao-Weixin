@@ -4,22 +4,24 @@ import cn.onekit.thekit.JSON;
 import com.google.gson.JsonObject;
 import com.qq.weixin.api.WeixinSDK;
 import com.qq.weixin.api.entity.*;
-import com.toutiao.developer.*;
+import com.toutiao.developer.ToutiaoAPI;
 import com.toutiao.developer.entity.*;
-import com.toutiao.developer.entity.v2.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ToutiaoServer implements ToutiaoAPI {
 
     private final String wx_appid;
     private final String wx_secret;
-    WeixinSDK weixinSDK= new WeixinSDK("https://api.weixin.qq.com");
+    private WeixinSDK weixinSDK= new WeixinSDK("https://api.weixin.qq.com");
     public ToutiaoServer(
             String wx_appid, String wx_secret) {
         this.wx_appid = wx_appid;
         this.wx_secret = wx_secret;
     }
 
-    final String wx_sig_method = "hmac_sha256";
+    private final String wx_sig_method = "hmac_sha256";
 
     //////////////////////////////////////
     abstract protected void _jscode_openid(String wx_jscode, String wx_openid);
@@ -199,13 +201,93 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
     public apps__subscribe_notification__developer__notify_response apps__subscribe_notification__developer__notify(
             apps__subscribe_notification__developer__notify_body tt_body
     ) throws ToutiaoError {
-        return null;
+        try {
+            Subscribe2Subscribe subscribe2subscribe=new Subscribe2Subscribe();
+            //
+            String access_token = tt_body.getAccess_token();
+            subscribe__send_body wx_body=new subscribe__send_body();
+
+            wx_body.setTouser(tt_body.getOpen_id());
+            wx_body.setPage(tt_body.getPage());
+            wx_body.setTemplate_id(subscribe2subscribe.id2id(tt_body.getTpl_id()));
+
+            HashMap<String, String> key2key = subscribe2subscribe.id2keys(tt_body.getTpl_id());
+            HashMap<String, subscribe__send_body.Data.DataValue> data = new HashMap<>();
+
+            for (Map.Entry<String, String> entry : tt_body.getData().entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                subscribe__send_body.Data.DataValue dataValue = new subscribe__send_body.Data.DataValue();
+                dataValue.setValue(value);
+
+                data.put(key2key.get(key),dataValue);
+            }
+
+            wx_body.setData(data);
+            WeixinResponse wx_response = weixinSDK.cgi_bin__message__subscribe__send(access_token,wx_body);
+            if (wx_response.getErrcode() != 0) {
+                apps__subscribe_notification__developer__notify_response tt_error = new apps__subscribe_notification__developer__notify_response();
+                tt_error.setErr_no(9527);
+
+
+                return tt_error;
+            }
+            apps__subscribe_notification__developer__notify_response tt_response =new apps__subscribe_notification__developer__notify_response();
+            return tt_response;
+        }catch (Exception e) {
+            e.printStackTrace();
+            ToutiaoError error = new ToutiaoError();
+            error.setError(9527);
+            error.setErrcode(9527);
+            error.setErrmsg(e.getMessage());
+            throw error;
+        }
     }
 
     @Override
     public apps__game__template__send_response apps__game__template__send(
             apps__game__template__send_body tt_body
     ) throws ToutiaoError {
-        return null;
+        try {
+        Push2Push push2push=new Push2Push();
+        //
+        String access_token = tt_body.getAccess_token();
+        subscribe__send_body wx_body=new subscribe__send_body();
+
+        wx_body.setTouser(tt_body.getTouser());
+        wx_body.setPage(tt_body.getPage());
+        wx_body.setTemplate_id(push2push.id2id(tt_body.getTemplate_id()));
+
+        HashMap<String, String> key2key = push2push.id2keys(tt_body.getTemplate_id());
+        HashMap<String, subscribe__send_body.Data.DataValue> data = new HashMap<>();
+
+            for (Map.Entry<String, apps__game__template__send_body.SubData> entry : tt_body.getData().entrySet()) {
+                String key = entry.getKey();
+                apps__game__template__send_body.SubData value = entry.getValue();
+                subscribe__send_body.Data.DataValue dataValue = new subscribe__send_body.Data.DataValue();
+                dataValue.setValue(value.getValue());
+                data.put(key2key.get(key),dataValue);
+            }
+
+        wx_body.setData(data);
+        WeixinResponse wx_response = weixinSDK.cgi_bin__message__subscribe__send(access_token,wx_body);
+        if (wx_response.getErrcode() != 0) {
+            apps__game__template__send_response tt_error = new apps__game__template__send_response();
+            tt_error.setErrcode(wx_response.getErrcode());
+            tt_error.setErrmsg(wx_response.getErrmsg());
+
+            return tt_error;
+        }
+            apps__game__template__send_response tt_response =new apps__game__template__send_response();
+        return tt_response;
+    }catch (Exception e) {
+            e.printStackTrace();
+            ToutiaoError error = new ToutiaoError();
+            error.setError(9527);
+            error.setErrcode(9527);
+            error.setErrmsg(e.getMessage());
+            throw error;
+        }
+
     }
 }

@@ -14,12 +14,18 @@
         <dependency>
             <groupId>cn.onekit.x2x.cloud</groupId>
             <artifactId>toutiao</artifactId>
-            <version>4.5.0</version>
+            <version>4.5.1</version>
         </dependency>
         <dependency>
             <groupId>cn.onekit.x2x.cloud</groupId>
             <artifactId>weixin-sdk</artifactId>
             <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.3.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

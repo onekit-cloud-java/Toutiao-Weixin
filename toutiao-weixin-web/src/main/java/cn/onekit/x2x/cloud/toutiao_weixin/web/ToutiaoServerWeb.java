@@ -3,10 +3,8 @@ package cn.onekit.x2x.cloud.toutiao_weixin.web;
 import cn.onekit.thekit.DB;
 import cn.onekit.thekit.JSON;
 import cn.onekit.x2x.cloud.toutiao_weixin.ToutiaoServer;
-import com.toutiao.developer.entity.ToutiaoError;
-import com.toutiao.developer.entity.apps__qrcode_body;
-import com.toutiao.developer.entity.apps__remove_user_storage_body;
-import com.toutiao.developer.entity.apps__set_user_storage_body;
+import com.qq.weixin.api.entity.subscribe__send_body;
+import com.toutiao.developer.entity.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -145,6 +143,40 @@ private ToutiaoServer _toutiaoServer;
             toutiaoError.setErrmsg(error.getMessage());
             return null;
         }
+    }
+    @RequestMapping(method = RequestMethod.POST, value = "api/apps/subscribe_notification/developer/v1/notify")
+    public String subscribe(
+            @RequestBody String body
+    ){
+        try {
+            return JSON.object2string(toutiaoServer().apps__subscribe_notification__developer__notify(JSON.string2object(body, apps__subscribe_notification__developer__notify_body.class)));
+        } catch (ToutiaoError toutiaoError) {
+            return JSON.object2string(toutiaoError);
+        }catch (Exception error) {
+            ToutiaoError toutiaoError = new ToutiaoError();
+            toutiaoError.setError(500);
+            toutiaoError.setErrcode(500);
+            toutiaoError.setErrmsg(error.getMessage());
+            return JSON.object2string(toutiaoError);
+        }
+
+    }
+    @RequestMapping(method = RequestMethod.POST, value = "api/apps/game/template/send")
+    public String send(
+            @RequestBody String body
+    ){
+        try {
+            return JSON.object2string(toutiaoServer().apps__game__template__send(JSON.string2object(body,apps__game__template__send_body.class)));
+        } catch (ToutiaoError toutiaoError) {
+            return JSON.object2string(toutiaoError);
+        }catch (Exception error) {
+            ToutiaoError toutiaoError = new ToutiaoError();
+            toutiaoError.setError(500);
+            toutiaoError.setErrcode(500);
+            toutiaoError.setErrmsg(error.getMessage());
+            return JSON.object2string(toutiaoError);
+        }
+
     }
 
 
