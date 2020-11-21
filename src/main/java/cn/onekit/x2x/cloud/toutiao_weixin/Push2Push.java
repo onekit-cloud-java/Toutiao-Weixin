@@ -13,12 +13,11 @@ import java.util.HashMap;
 public class Push2Push implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
     private HashMap<String,HashMap<String,String>> keys2keys = new HashMap<String,HashMap<String,String>>(){{
+
         put("支付通知", new HashMap<String,String>(){{
             put("时间","付款时间");
             put("金额","付款金额");
             put("商家名称","商品名称");
-
-
         }});
     }};
 
