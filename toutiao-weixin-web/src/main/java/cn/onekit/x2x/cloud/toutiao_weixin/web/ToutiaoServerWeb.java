@@ -3,7 +3,6 @@ package cn.onekit.x2x.cloud.toutiao_weixin.web;
 import cn.onekit.thekit.DB;
 import cn.onekit.thekit.JSON;
 import cn.onekit.x2x.cloud.toutiao_weixin.ToutiaoServer;
-import com.qq.weixin.api.entity.subscribe__send_body;
 import com.toutiao.developer.entity.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -47,9 +46,9 @@ private ToutiaoServer _toutiaoServer;
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/apps/token")
     public String getAccessToken(
-            @RequestParam String appid,
-            @RequestParam String secret,
-            @RequestParam String grant_type
+            @RequestParam(required = false) String appid,
+            @RequestParam(required = false) String secret,
+            @RequestParam(required = false) String grant_type
     )  {
         try {
             return JSON.object2string(toutiaoServer().apps__token(appid, secret, grant_type));
@@ -66,8 +65,8 @@ private ToutiaoServer _toutiaoServer;
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/apps/jscode2session")
     public String code2Session(
-            @RequestParam String appid,
-            @RequestParam String secret,
+            @RequestParam(required=false) String appid,
+            @RequestParam(required=false) String secret,
             @RequestParam(required=false) String code,
             @RequestParam(required=false)  String anonymous_code
     )  {

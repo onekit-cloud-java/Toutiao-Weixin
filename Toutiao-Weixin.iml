@@ -16,7 +16,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: cn.onekit.x2x.cloud:thekit:2.0.0" level="project" />
-    <orderEntry type="library" name="Maven: cn.onekit.x2x.cloud:toutiao:4.5.1" level="project" />
+    <orderEntry type="library" name="Maven: cn.onekit.x2x.cloud:toutiao:4.5.2" level="project" />
     <orderEntry type="library" name="Maven: cn.onekit.x2x.cloud:TheKit:3.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.6" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.10" level="project" />
