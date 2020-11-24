@@ -107,10 +107,10 @@ private ToutiaoServer _toutiaoServer;
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/apps/remove_user_storage")
     public String removeUserStorage(
-            @RequestParam String session_key,
-            @RequestParam String access_token,
-            @RequestParam String openid,
-            @RequestParam String signature,
+            @RequestParam(required=false) String session_key,
+            @RequestParam(required=false) String access_token,
+            @RequestParam(required=false) String openid,
+            @RequestParam(required=false) String signature,
             @RequestBody String body
     )  {
         try {
