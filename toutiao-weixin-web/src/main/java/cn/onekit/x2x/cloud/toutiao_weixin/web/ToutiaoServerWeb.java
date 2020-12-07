@@ -21,12 +21,12 @@ private ToutiaoServer _toutiaoServer;
            _toutiaoServer = new ToutiaoServer(WeixinAccount.wx_appid, WeixinAccount.wx_secret) {
 
                @Override
-               protected void _jscode_openid(String wx_jscode, String wx_openid) {
+               protected void _code_openid(String wx_jscode, String wx_openid) {
                    DB.set("[toutiao-weixin] jscode_openid",wx_jscode,wx_openid);
                }
 
                @Override
-               protected String _jscode_openid(String wx_jscode) {
+               protected String _code_openid(String wx_jscode) {
                    return  DB.get("[toutiao-weixin] jscode_openid",wx_jscode);
                }
 
@@ -134,13 +134,13 @@ private ToutiaoServer _toutiaoServer;
         try {
             return toutiaoServer().apps__qrcode(JSON.string2object(body, apps__qrcode_body.class));
         } catch (ToutiaoError toutiaoError) {
-            return null;
+            return JSON.object2string(toutiaoError).getBytes();
         }catch (Exception error){
             ToutiaoError toutiaoError = new ToutiaoError();
             toutiaoError.setError(500);
             toutiaoError.setErrcode(500);
             toutiaoError.setErrmsg(error.getMessage());
-            return null;
+            return JSON.object2string(toutiaoError).getBytes();
         }
     }
     @RequestMapping(method = RequestMethod.POST, value = "api/apps/subscribe_notification/developer/v1/notify")
@@ -160,23 +160,23 @@ private ToutiaoServer _toutiaoServer;
         }
 
     }
-    @RequestMapping(method = RequestMethod.POST, value = "api/apps/game/template/send")
-    public String send(
-            @RequestBody String body
-    ){
-        try {
-            return JSON.object2string(toutiaoServer().apps__game__template__send(JSON.string2object(body,apps__game__template__send_body.class)));
-        } catch (ToutiaoError toutiaoError) {
-            return JSON.object2string(toutiaoError);
-        }catch (Exception error) {
-            ToutiaoError toutiaoError = new ToutiaoError();
-            toutiaoError.setError(500);
-            toutiaoError.setErrcode(500);
-            toutiaoError.setErrmsg(error.getMessage());
-            return JSON.object2string(toutiaoError);
-        }
-
-    }
+//    @RequestMapping(method = RequestMethod.POST, value = "api/apps/game/template/send")
+//    public String send(
+//            @RequestBody String body
+//    ){
+//        try {
+//            return JSON.object2string(toutiaoServer().apps__game__template__send(JSON.string2object(body,apps__game__template__send_body.class)));
+//        } catch (ToutiaoError toutiaoError) {
+//            return JSON.object2string(toutiaoError);
+//        }catch (Exception error) {
+//            ToutiaoError toutiaoError = new ToutiaoError();
+//            toutiaoError.setError(500);
+//            toutiaoError.setErrcode(500);
+//            toutiaoError.setErrmsg(error.getMessage());
+//            return JSON.object2string(toutiaoError);
+//        }
+//
+//    }
 
 
 }

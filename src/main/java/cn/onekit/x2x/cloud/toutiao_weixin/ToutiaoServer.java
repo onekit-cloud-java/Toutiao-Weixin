@@ -24,8 +24,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
     private final String wx_sig_method = "hmac_sha256";
 
     //////////////////////////////////////
-    abstract protected void _jscode_openid(String wx_jscode, String wx_openid);
-    abstract protected String _jscode_openid(String wx_jscode);
+    abstract protected void _code_openid(String wx_code, String wx_openid);
+    abstract protected String _code_openid(String wx_code);
     abstract protected void _openid_sessionkey(String wx_openid, String wx_sessionkey);
     abstract protected String _openid_sessionkey(String wx_openid);
 
@@ -88,7 +88,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
         }
         boolean isCode =  tt_code!=null;
         final String code = isCode?tt_code:tt_anonymous_code;
-        String wx_openid = _jscode_openid(code);
+        String wx_openid = _code_openid(code);
         String wx_session_key;
         if(wx_openid!=null){
             wx_session_key = _openid_sessionkey(wx_openid);
@@ -141,7 +141,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
          wx_openid = wx_response.getOpenid();
          wx_session_key = wx_response.getSession_key();
          ///////////////
-        _jscode_openid(code,wx_openid);
+        _code_openid(code,wx_openid);
         _openid_sessionkey(wx_openid,wx_session_key);
         ////////////
         apps__jscode2session_response tt_response = new apps__jscode2session_response();
