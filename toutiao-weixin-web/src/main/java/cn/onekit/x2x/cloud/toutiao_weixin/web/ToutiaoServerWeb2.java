@@ -1,6 +1,6 @@
 package cn.onekit.x2x.cloud.toutiao_weixin.web;
 
-import cn.onekit.thekit.DB;
+import cn.onekit.thekit.FileDB;
 import cn.onekit.thekit.JSON;
 import cn.onekit.x2x.cloud.toutiao_weixin.ToutiaoServer2;
 import com.toutiao.developer.entity.v2.ToutiaoError2;
@@ -22,22 +22,22 @@ public class ToutiaoServerWeb2 {
             _toutiaoServer2 = new ToutiaoServer2(WeixinAccount.wx_appid,WeixinAccount.wx_secret) {
                 @Override
                 protected void _jscode_openid(String wx_jscode, String wx_openid) {
-                    DB.set("[toutiao-weixin] jscode_openid",wx_jscode,wx_openid);
+                    FileDB.set("[toutiao-weixin] jscode_openid",wx_jscode,wx_openid);
                 }
 
                 @Override
-                protected String _jscode_openid(String wx_jscode) {
-                    return DB.get("[toutiao-weixin] jscode",wx_jscode);
+                protected FileDB.Data _jscode_openid(String wx_jscode) {
+                    return FileDB.get("[toutiao-weixin] jscode",wx_jscode);
                 }
 
                 @Override
                 protected void _openid_sessionkey(String wx_openid, String wx_sessionkey) {
-                    DB.set("[toutiao-weixin] openid_sessionkey",wx_openid,wx_sessionkey);
+                    FileDB.set("[toutiao-weixin] openid_sessionkey",wx_openid,wx_sessionkey);
                 }
 
                 @Override
-                protected String _openid_sessionkey(String wx_openid) {
-                    return DB.get("[toutiao-weixin] openid",wx_openid);
+                protected FileDB.Data _openid_sessionkey(String wx_openid) {
+                    return FileDB.get("[toutiao-weixin] openid",wx_openid);
                 }
             };
         }

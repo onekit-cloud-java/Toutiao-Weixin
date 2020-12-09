@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 
+@SuppressWarnings("unused")
 @Component
 @PropertySource(value = {"classpath:push2push.properties"},ignoreResourceNotFound = true)
 public class Push2Push implements ApplicationContextAware {

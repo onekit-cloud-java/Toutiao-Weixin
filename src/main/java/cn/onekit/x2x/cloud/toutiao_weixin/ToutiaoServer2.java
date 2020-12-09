@@ -1,6 +1,7 @@
 package cn.onekit.x2x.cloud.toutiao_weixin;
 
 import cn.onekit.thekit.AJAX;
+import cn.onekit.thekit.FileDB;
 import com.qq.weixin.api.WeixinSDK;
 import com.qq.weixin.api.entity.WeixinResponse;
 import com.qq.weixin.api.entity.wxa__msg_sec_check_body;
@@ -13,9 +14,14 @@ import java.util.ArrayList;
 
 public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
 
+
+
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private final String wx_appid;
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final String wx_secret;
-    WeixinSDK weixinSDK= new WeixinSDK("https://api.weixin.qq.com");
+    private WeixinSDK weixinSDK= new WeixinSDK("https://api.weixin.qq.com");
+    @SuppressWarnings("WeakerAccess")
     public ToutiaoServer2(
             String wx_appid, String wx_secret) {
         this.wx_appid = wx_appid;
@@ -24,47 +30,34 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
 
 
     //////////////////////////////////////
+    @SuppressWarnings("unused")
     abstract protected void _jscode_openid(String wx_jscode, String wx_openid);
-    abstract protected String _jscode_openid(String wx_jscode);
+    @SuppressWarnings("unused")
+    abstract protected FileDB.Data _jscode_openid(String wx_jscode);
+    @SuppressWarnings("unused")
     abstract protected void _openid_sessionkey(String wx_openid, String wx_sessionkey);
 
-    abstract protected String _openid_sessionkey(String wx_openid);
+    @SuppressWarnings("unused")
+    abstract protected FileDB.Data _openid_sessionkey(String wx_openid);
 
+
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public tags__text__antidirt_response tags__text__antidirt(String tt_X_Token, tags__text__antidirt_body tt_body) throws ToutiaoError2 {
 
         //////////////
-    try{
+        //noinspection CaughtExceptionImmediatelyRethrown
+        try{
         tags__text__antidirt_response tt_response = new tags__text__antidirt_response();
         ArrayList<tags__text__antidirt_response.Data> datas = new ArrayList<>();
         for(tags__text__antidirt_body.Task task: tt_body.getTasks()) {
             wxa__msg_sec_check_body wx_body = new wxa__msg_sec_check_body();
             wx_body.setContent(task.getContent());
             WeixinResponse wx_response = weixinSDK.wxa__msg_sec_check(tt_X_Token, wx_body);
-            if (wx_response.getErrcode() != 0 && wx_response.getErrcode() != 87014 ) {
-                ToutiaoError2 tt_error = new ToutiaoError2();
-                 switch (wx_response.getErrcode()){
-                     case 40001:
-                         tt_error.setError_id("1");
-                         tt_error.setCode(401);
-                         tt_error.setMessage("[app token sign fail] bad token");
-                         tt_error.setException("[app token sign fail] bad token");
-                         break;
-                     case 44002:
-                         tt_error.setError_id("1");
-                         tt_error.setCode(400);
-                         tt_error.setMessage("'tasks' is a required property");
-                         tt_error.setException("'tasks' is a required property");
-                         break;
-                     default:
-                         tt_error.setError_id("74077");
-                         tt_error.setCode(74077);
-                         tt_error.setMessage(wx_response.getErrmsg());
-                         tt_error.setMessage(wx_response.getErrmsg());
-                         break;
-                 }
-                 throw tt_error;
-            }
+
+
+            _checkError(wx_response);
+
             tags__text__antidirt_response.Data data = new tags__text__antidirt_response.Data();
 
                data.setMsg("");
@@ -94,6 +87,8 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
     }
     }
 
+
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public tags__image_response tags__image(String tt_X_Token, tags__image_body tt_body) throws ToutiaoError2 {
     try{
@@ -114,32 +109,10 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
                 throw tt_error;
             }
             WeixinResponse wx_response = weixinSDK.wxa__img_sec_check(tt_X_Token, wx_body);
-            if (wx_response.getErrcode() != 0 && wx_response.getErrcode() != 87014) {
-                ToutiaoError2 tt_error = new ToutiaoError2();
-                switch (wx_response.getErrcode()){
-                    case 40001:
-                        tt_error.setError_id("1");
-                        tt_error.setCode(401);
-                        tt_error.setMessage("[app token sign fail] bad token");
-                        tt_error.setException("[app token sign fail] bad token");
-                        break;
-                    case 44002:
-                        tt_error.setError_id("1");
-                        tt_error.setCode(400);
-                        tt_error.setMessage("'tasks' is a required property");
-                        tt_error.setException("'tasks' is a required property");
-                        break;
-                    default:
-                        tt_error.setError_id("74077");
-                        tt_error.setCode(74077);
-                        tt_error.setMessage(wx_response.getErrmsg());
-                        tt_error.setMessage(wx_response.getErrmsg());
-                        break;
-                }
-                throw tt_error;
 
 
-            }
+            _checkError(wx_response);
+
             tags__image_response.Data data = new tags__image_response.Data();
             data.setMsg("");
             data.setCode(0);
@@ -169,5 +142,34 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
         e.printStackTrace();
     }
     return null;
+    }
+
+    private void _checkError(WeixinResponse wx_response) throws ToutiaoError2 {
+        if (wx_response.getErrcode() != 0 && wx_response.getErrcode() != 87014) {
+            ToutiaoError2 tt_error = new ToutiaoError2();
+            switch (wx_response.getErrcode()){
+                case 40001:
+                    tt_error.setError_id("1");
+                    tt_error.setCode(401);
+                    tt_error.setMessage("[app token sign fail] bad token");
+                    tt_error.setException("[app token sign fail] bad token");
+                    break;
+                case 44002:
+                    tt_error.setError_id("1");
+                    tt_error.setCode(400);
+                    tt_error.setMessage("'tasks' is a required property");
+                    tt_error.setException("'tasks' is a required property");
+                    break;
+                default:
+                    tt_error.setError_id("74077");
+                    tt_error.setCode(74077);
+                    tt_error.setMessage(wx_response.getErrmsg());
+                    tt_error.setMessage(wx_response.getErrmsg());
+                    break;
+            }
+            throw tt_error;
+
+
+        }
     }
 }

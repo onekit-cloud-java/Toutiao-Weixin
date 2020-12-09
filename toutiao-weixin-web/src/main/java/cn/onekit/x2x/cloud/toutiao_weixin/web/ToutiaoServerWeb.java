@@ -1,14 +1,12 @@
 package cn.onekit.x2x.cloud.toutiao_weixin.web;
 
-import cn.onekit.thekit.DB;
+import cn.onekit.thekit.FileDB;
 import cn.onekit.thekit.JSON;
 import cn.onekit.x2x.cloud.toutiao_weixin.ToutiaoServer;
 import com.toutiao.developer.entity.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 
 @RestController
@@ -22,22 +20,23 @@ private ToutiaoServer _toutiaoServer;
 
                @Override
                protected void _code_openid(String wx_jscode, String wx_openid) {
-                   DB.set("[toutiao-weixin] jscode_openid",wx_jscode,wx_openid);
+                   FileDB.set("[toutiao-weixin] jscode_openid",wx_jscode,wx_openid);
                }
 
                @Override
-               protected String _code_openid(String wx_jscode) {
-                   return  DB.get("[toutiao-weixin] jscode_openid",wx_jscode);
+               protected FileDB.Data _code_openid(String wx_jscode) {
+                   return  FileDB.get("[toutiao-weixin] jscode_openid",wx_jscode);
                }
 
                @Override
                protected void _openid_sessionkey(String wx_openid, String wx_sessionkey) {
-                   DB.set("[toutiao-weixin] openid_sessionkey",wx_openid,wx_sessionkey);
+                   FileDB.set("[toutiao-weixin] openid_sessionkey",wx_openid,wx_sessionkey);
                }
 
                @Override
-               protected String _openid_sessionkey(String wx_openid) {
-                   return DB.get("[toutiao-weixin] openid_sessionkey",wx_openid);
+               protected FileDB.Data _openid_sessionkey(String wx_openid) {
+                   return  FileDB.get("[toutiao-weixin] openid_sessionkey",wx_openid);
+
                }
            };
        }
@@ -83,7 +82,7 @@ private ToutiaoServer _toutiaoServer;
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api/apps/set_user_storage")
+    /*@RequestMapping(method = RequestMethod.POST, value = "/api/apps/set_user_storage")
     public String setUserStorage(
             HttpServletRequest request,
             @RequestBody String body
@@ -125,11 +124,10 @@ private ToutiaoServer _toutiaoServer;
             return JSON.object2string(toutiaoError);
         }
     }
-
+*/
     @RequestMapping(method = RequestMethod.POST, value = "/api/apps/qrcode",produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] createQRCode(
-            @RequestBody String body,
-            HttpServletResponse response
+            @RequestBody String body
     )  {
         try {
             return toutiaoServer().apps__qrcode(JSON.string2object(body, apps__qrcode_body.class));

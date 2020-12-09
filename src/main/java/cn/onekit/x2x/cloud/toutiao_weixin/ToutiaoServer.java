@@ -1,7 +1,6 @@
 package cn.onekit.x2x.cloud.toutiao_weixin;
 
-import cn.onekit.thekit.JSON;
-import com.google.gson.JsonObject;
+import cn.onekit.thekit.FileDB;
 import com.qq.weixin.api.WeixinSDK;
 import com.qq.weixin.api.entity.*;
 import com.toutiao.developer.ToutiaoAPI;
@@ -15,19 +14,20 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
     private final String wx_appid;
     private final String wx_secret;
     private WeixinSDK weixinSDK= new WeixinSDK("https://api.weixin.qq.com");
-    public ToutiaoServer(
+    protected ToutiaoServer(
             String wx_appid, String wx_secret) {
         this.wx_appid = wx_appid;
         this.wx_secret = wx_secret;
     }
 
-    private final String wx_sig_method = "hmac_sha256";
+
+    //private final String wx_sig_method = "hmac_sha256";
 
     //////////////////////////////////////
     abstract protected void _code_openid(String wx_code, String wx_openid);
-    abstract protected String _code_openid(String wx_code);
+    abstract protected FileDB.Data _code_openid(String wx_code);
     abstract protected void _openid_sessionkey(String wx_openid, String wx_sessionkey);
-    abstract protected String _openid_sessionkey(String wx_openid);
+    abstract protected FileDB.Data _openid_sessionkey(String wx_openid);
 
     //////////////////////////////////////
 
@@ -88,14 +88,15 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
         }
         boolean isCode =  tt_code!=null;
         final String code = isCode?tt_code:tt_anonymous_code;
-        String wx_openid = _code_openid(code);
-        String wx_session_key;
-        if(wx_openid!=null){
-            wx_session_key = _openid_sessionkey(wx_openid);
+        FileDB.Data wx_openid_data = _code_openid(code);
+        FileDB.Data wx_session_key_data = null;
+        if(wx_openid_data!=null){
+            String wx_openid = wx_openid_data.value;
+            wx_session_key_data = _openid_sessionkey(wx_openid);
             apps__jscode2session_response tt_response = new apps__jscode2session_response();
             tt_response.setAnonymous_openid(wx_openid);
             tt_response.setOpenid(wx_openid);
-            tt_response.setSession_key(wx_session_key);
+            tt_response.setSession_key(wx_session_key_data.value);
             return tt_response;
         }
         ///////////////////////////////////////////////////
@@ -123,12 +124,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
                         tt_error.setMessage("bad anonymous code");
                     }
                     break;
-                case 45011:
-                    tt_error.setError(1);
-                    tt_error.setErrcode(-1);
-                    tt_error.setErrmsg(wx_response.getErrmsg());
-                    tt_error.setMessage(wx_response.getErrmsg());
-                    break;
+
                 default:
                     tt_error.setError(74077);
                     tt_error.setErrcode(74077);
@@ -138,20 +134,23 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             }
             throw tt_error;
         }
-         wx_openid = wx_response.getOpenid();
-         wx_session_key = wx_response.getSession_key();
+
+        assert false;
+        wx_openid_data.value =wx_response.getOpenid();
+
+        wx_session_key_data.value =wx_response.getSession_key();
          ///////////////
-        _code_openid(code,wx_openid);
-        _openid_sessionkey(wx_openid,wx_session_key);
+        _code_openid(code,wx_openid_data.value);
+        _openid_sessionkey(wx_openid_data.value,wx_session_key_data.value);
         ////////////
         apps__jscode2session_response tt_response = new apps__jscode2session_response();
-        tt_response.setAnonymous_openid(wx_openid);
-        tt_response.setOpenid(wx_openid);
-        tt_response.setSession_key(wx_session_key);
+        tt_response.setAnonymous_openid(wx_openid_data.value);
+        tt_response.setOpenid(wx_openid_data.value);
+        tt_response.setSession_key(wx_session_key_data.value);
         return tt_response;
     }
 
-    @Override
+    /*@Override
     public apps__set_user_storage_response apps__set_user_storage(
             String tt_access_token,
             String tt_openid,
@@ -161,7 +160,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
     ) throws ToutiaoError {
 
         try {
-            String wx_session_key = _openid_sessionkey(tt_openid);
+            FileDB.Data wx_session_key = _openid_sessionkey(tt_openid);
             try {
                 if (!_signBody(tt_sig_method, wx_session_key, JSON.object2string(tt_body)).equals(tt_signature)) {
                     throw new Exception("bad sign!");
@@ -309,7 +308,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             throw tt_error;
         }
     }
-
+*/
     @Override
     public byte[] apps__qrcode(
             apps__qrcode_body tt_body
@@ -321,8 +320,8 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             wx_body.setPath(tt_body.getPath());
             wx_body.setWidth(tt_body.getWidth());
             //////////////
-            byte[] wx_response = weixinSDK.cgi_bin__wxaapp__createwxaqrcode(wx_access_token, wx_body);
             WeixinError wx_error = new WeixinError();
+            //noinspection EqualsBetweenInconvertibleTypes
             if(!wx_error.equals(0)){
                 ToutiaoError tt_error = new ToutiaoError();
                 switch (wx_error.getErrcode()){
@@ -356,61 +355,58 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
     public apps__subscribe_notification__developer__notify_response apps__subscribe_notification__developer__notify(
             apps__subscribe_notification__developer__notify_body tt_body
     ) throws ToutiaoError {
-        try {
-            Subscribe2Subscribe subscribe2subscribe=new Subscribe2Subscribe();
-            //
-            String access_token = tt_body.getAccess_token();
-            subscribe__send_body wx_body=new subscribe__send_body();
+        Subscribe2Subscribe subscribe2subscribe=new Subscribe2Subscribe();
+        //
+        String access_token = tt_body.getAccess_token();
+        subscribe__send_body wx_body=new subscribe__send_body();
 
-            wx_body.setTouser(tt_body.getOpen_id());
-            wx_body.setPage(tt_body.getPage());
-            wx_body.setTemplate_id(subscribe2subscribe.id2id(tt_body.getTpl_id()));
+        wx_body.setTouser(tt_body.getOpen_id());
+        wx_body.setPage(tt_body.getPage());
+        wx_body.setTemplate_id(subscribe2subscribe.id2id(tt_body.getTpl_id()));
 
-            HashMap<String, String> key2key = subscribe2subscribe.id2keys(tt_body.getTpl_id());
-            HashMap<String, subscribe__send_body.Data.DataValue> data = new HashMap<>();
+        HashMap<String, String> key2key = subscribe2subscribe.id2keys(tt_body.getTpl_id());
+        HashMap<String, subscribe__send_body.Data.DataValue> data = new HashMap<>();
 
-            for (Map.Entry<String, String> entry : tt_body.getData().entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                subscribe__send_body.Data.DataValue dataValue = new subscribe__send_body.Data.DataValue();
-                dataValue.setValue(value);
+        for (Map.Entry<String, String> entry : tt_body.getData().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            subscribe__send_body.Data.DataValue dataValue = new subscribe__send_body.Data.DataValue();
+            dataValue.setValue(value);
 
-                data.put(key2key.get(key),dataValue);
-            }
-
-            wx_body.setData(data);
-            WeixinResponse wx_response = weixinSDK.cgi_bin__message__subscribe__send(access_token,wx_body);
-            if (wx_response.getErrcode() != 0) {
-             ToutiaoError tt_error = new ToutiaoError();
-               switch (wx_response.getErrcode()){
-                   case 44002:
-                       tt_error.setErrcode(40001);
-                       tt_error.setErrmsg("bad body");
-                       break;
-                   case 41001:
-                       tt_error.setErrcode(40014);
-                       tt_error.setErrmsg("missing access_token");
-                       break;
-                   case 40001:
-                       tt_error.setErrcode(-1);
-                       tt_error.setErrmsg("internal error");
-                   case 41030:
-                       tt_error.setErrcode(40041);
-                       tt_error.setErrmsg(wx_response.getErrmsg());
-                   default:
-                       tt_error.setErrcode(74077);
-                       tt_error.setErrmsg(wx_response.getErrmsg());
-               }
-                throw  tt_error;
-            }
-            apps__subscribe_notification__developer__notify_response tt_response =new apps__subscribe_notification__developer__notify_response();
-            return tt_response;
-        }catch (ToutiaoError tt_error) {
-            throw tt_error;
+            data.put(key2key.get(key),dataValue);
         }
+
+        wx_body.setData(data);
+        WeixinResponse wx_response = weixinSDK.cgi_bin__message__subscribe__send(access_token,wx_body);
+        if (wx_response.getErrcode() != 0) {
+         ToutiaoError tt_error = new ToutiaoError();
+           switch (wx_response.getErrcode()){
+               case 44002:
+                   tt_error.setErrcode(40001);
+                   tt_error.setErrmsg("bad body");
+                   break;
+               case 41001:
+                   tt_error.setErrcode(40014);
+                   tt_error.setErrmsg("missing access_token");
+                   break;
+               case 40001:
+                   tt_error.setErrcode(-1);
+                   tt_error.setErrmsg("internal error");
+               case 41030:
+                   tt_error.setErrcode(40041);
+                   tt_error.setErrmsg(wx_response.getErrmsg());
+               default:
+                   tt_error.setErrcode(74077);
+                   tt_error.setErrmsg(wx_response.getErrmsg());
+           }
+            throw  tt_error;
+        }
+        return new apps__subscribe_notification__developer__notify_response();
     }
 
-    @Override
+
+
+    /*@Override
     public apps__game__template__send_response apps__game__template__send(
             apps__game__template__send_body tt_body
     ) throws ToutiaoError {
@@ -474,5 +470,5 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
 
         }
 
-    }
+    }*/
 }
