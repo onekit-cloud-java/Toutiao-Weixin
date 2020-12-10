@@ -316,9 +316,10 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
 
         try {
             final String wx_access_token = tt_body.getAccess_token();
-            wxaapp__createwxaqrcode_body wx_body =new wxaapp__createwxaqrcode_body();
-            wx_body.setPath(tt_body.getPath());
+            wxa__getwxacodeunlimit_body wx_body =new wxa__getwxacodeunlimit_body();
+            wx_body.setPage(tt_body.getPath());
             wx_body.setWidth(tt_body.getWidth());
+            wx_body.setScene("xxx");
             //////////////
             WeixinError wx_error = new WeixinError();
             //noinspection EqualsBetweenInconvertibleTypes
@@ -339,7 +340,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
                 }
             }
 
-            return  weixinSDK.cgi_bin__wxaapp__createwxaqrcode(wx_access_token, wx_body);
+            return  weixinSDK.wxa__getwxacodeunlimit(wx_access_token, wx_body);
         } catch (WeixinError wx_error) {
             ToutiaoError tt_error = new ToutiaoError();
             tt_error.setError(74077);
